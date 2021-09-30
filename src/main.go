@@ -35,7 +35,11 @@ func main() {
 Loop:
 	for {
 		select {
-		case batch := <-batchIterator:
+		case batch, ok := <-batchIterator:
+			if !ok {
+				batch = nil
+				continue
+			}
 			batchCounter += 1
 			fmt.Print(".")
 			if batchCounter%32 == 0 {
@@ -51,6 +55,7 @@ Loop:
 			csvWriter.Append(columns)
 		case receivedError := <-_err:
 			if receivedError.Error() == "EOS" {
+				fmt.Printf("%d batches of data processed", batchCounter)
 				break Loop
 			}
 			panic(receivedError)
