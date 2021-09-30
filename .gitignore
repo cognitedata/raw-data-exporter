@@ -1,3 +1,6 @@
+.vscode
+*credentials*
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
