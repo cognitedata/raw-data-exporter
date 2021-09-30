@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -67,6 +68,7 @@ func FromCredentialsFile(path string) (result CdfClient, err error) {
 		config.EndpointParams.Set("audience", result.Audience)
 	}
 	result.httpClient = config.Client(context.Background())
+	result.httpClient.Timeout = time.Second * 60
 
 	return result, nil
 }
@@ -74,7 +76,8 @@ func FromCredentialsFile(path string) (result CdfClient, err error) {
 const LIMIT = 1000
 
 func (api *CdfClient) RetrieveRows(dbName string, tableName string) (batch chan []RawRow, _err chan error) {
-	batch = make(chan []RawRow, LIMIT)
+	batch = make(chan []RawRow)
+	_err = make(chan error)
 
 	go func() {
 		cdfQueryParams := make(url.Values)
